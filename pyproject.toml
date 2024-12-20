@@ -1,0 +1,38 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "llm-recorder"
+version = "0.0.1"
+description = "Record LLM calls and responses"
+readme = "README.md"
+requires-python = ">=3.10"
+authors = [
+    { name = "Zbigniew Łukasiak", email = "zbigniew@lukasiak.me" }
+]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent"
+]
+dependencies = [
+    "litellm>=1.55.7",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.4.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/zby/llm_recorder"
+
+
+[tool.pytest.ini_options]
+addopts = "-v"
+testpaths = ["llm_recorder"]
+
+[tool.setuptools]
+packages = ["llm_recorder"]
+
