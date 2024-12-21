@@ -8,8 +8,10 @@ MODEL = "anthropic/claude-3-5-sonnet-20240620"
 script_dir = os.path.dirname(os.path.abspath(__file__))
 saves_dir = os.path.join(script_dir, "saves")
 
-# Enable replay mode with the local saves directory (if it doesn't exist, it will be created)
 enable_replay_mode(replay_dir=saves_dir, replay_count=1)
+# replay_count=1 means that the first call will be replayed and the second will be live
+# there is one request response pair saved in the saves directory - it was generated with the OpenAI model
+# now we can replay it and then make another live call to Anthropic
 
 # System message to set the context for our interaction
 system_message = {
