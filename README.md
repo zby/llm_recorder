@@ -1,10 +1,11 @@
 # llm_recorder
 
-`llm_recorder` is a Python library that helps you record and replay interactions with language models.  
+`llm_recorder` is a basic local observability and debugging tool for language model apps
+- it helps you record and replay interactions with LLMs.
 It is particularly useful for debugging chained LLM calls.
 
 Currently it works via [litellm](https://github.com/BerriAI/litellm),
-but there is an experimental OpenAI replay mode that works directly with the OpenAI client.
+but there is an experimental mode that works directly with the OpenAI client.
 See [examples/openai_basic.py](examples/openai_basic.py).
 
 With `llm_recorder`, you can:
