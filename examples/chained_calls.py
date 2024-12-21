@@ -7,6 +7,10 @@ import litellm
 # Now we can replay it and then make another live call to Anthropic
 
 
+# Note: This example assumes that you have set up your API credentials
+# in your environment variables. Depending on the model you choose, you'll need to set:
+# - OPENAI_API_KEY for OpenAI models
+# - ANTHROPIC_API_KEY for Anthropic models
 
 #MODEL = "openai/gpt-4o-mini"
 MODEL = "anthropic/claude-3-5-sonnet-20240620"

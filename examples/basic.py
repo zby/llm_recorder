@@ -2,6 +2,11 @@ from llm_recorder import enable_replay_mode
 
 import litellm
 
+# Note: This example assumes that you have set up your API credentials
+# in your environment variables. Depending on the model you choose, you'll need to set:
+# - OPENAI_API_KEY for OpenAI models
+# - ANTHROPIC_API_KEY for Anthropic models
+
 
 enable_replay_mode(replay_dir="saves")
 
