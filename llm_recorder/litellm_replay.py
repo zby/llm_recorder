@@ -113,6 +113,9 @@ class ReplayLiteLLM:
         self.interactions: List[LLMInteraction] = []
         
         self._load_interactions()
+        if replay_count > len(self.interactions):
+            raise ValueError(f"replay_count is greater than the number of interactions in replay_dir: {len(self.interactions)}")
+
         for file in self.save_dir.glob("*.json"):
             file.unlink()
         
@@ -146,7 +149,7 @@ class ReplayLiteLLM:
         interaction = LLMInteraction(
             timestamp=datetime.now().isoformat(),
             request=kwargs,
-            response=response.model_dump()
+            response=self.model_response_to_dict(response)
         )
         return interaction
 
@@ -161,6 +164,12 @@ class ReplayLiteLLM:
             interaction = self._make_live_call(**kwargs)
             logger.info("Making live LLM call")
         self._save_interaction(interaction)
-        return litellm.ModelResponse(**interaction.response) 
+        return self.dict_to_model_response(interaction.response)
+
+    def dict_to_model_response(self, dict: Dict[str, Any]) -> litellm.ModelResponse:
+        return litellm.ModelResponse(**dict)
+
+    def model_response_to_dict(self, model_response: litellm.ModelResponse) -> Dict[str, Any]:
+        return model_response.model_dump()
 
 

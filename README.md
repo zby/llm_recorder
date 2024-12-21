@@ -3,7 +3,9 @@
 `llm_recorder` is a Python library that helps you record and replay interactions with language models.  
 It is particularly useful for debugging chained LLM calls.
 
-Currently it works only via [litellm](https://github.com/bentoml/litellm).
+Currently it works via [litellm](https://github.com/BerriAI/litellm),
+but there is an experimental OpenAI replay mode that works directly with the OpenAI client.
+See [examples/openai_basic.py](examples/openai_basic.py).
 
 With `llm_recorder`, you can:
 
@@ -17,7 +19,7 @@ You can use it to:
 
 ## Features
 
-- **Seamless Integration with [litellm](https://github.com/<your-litellm-source-here>):**  
+- **Seamless Integration with [litellm](https://github.com/BerriAI/litellm):**
   Start recording and replaying interactions by just calling `enable_replay_mode()`.
   
 - **Local Storage:**  
