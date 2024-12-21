@@ -1,0 +1,13 @@
+{
+  "model": "openai/gpt-4o-mini",
+  "messages": [
+    {
+      "role": "system",
+      "content": "You are a knowledgeable teacher who first suggests interesting topics to learn about,\nthen provides short explanations about the chosen topic. Please keep the explanations to 3 sentences or less."
+    },
+    {
+      "role": "user",
+      "content": "Suggest an interesting scientific topic that most people don't know about. Keep it to one sentence."
+    }
+  ]
+}

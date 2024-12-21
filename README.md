@@ -1,7 +1,7 @@
 # llm_recorder
 
 `llm_recorder` is a Python library that helps you record and replay interactions with language models.  
-It is particularly useful for debugging complex applications that rely on LLM responses.  
+It is particularly useful for debugging chained LLM calls.
 
 Currently it works only via [litellm](https://github.com/bentoml/litellm).
 
@@ -43,7 +43,7 @@ The save_dir is cleaned up at the start of each run, but replay_dir is read befo
 so if they are the same directory, you can still replay the old interactions.
 
 
-Example
+### Basic Example
 
 ```python
 from llm_recorder import enable_replay_mode
@@ -63,6 +63,11 @@ response = litellm.completion(
 )
 ```
 Then have a look at the 'saves' directory to see the recorded interactions.
+
+### Chained Calls Example
+See [examples/chained_calls.py](examples/chained_calls.py) for an example of how to use `llm_recorder` to record and replay chained LLM calls.
+I saved the first response in [examples/saves/1.response.json](examples/saves/1.response.json) and the example should replay it and then make another live call.
+The saved response was from OpenAI, but the second call is now directed to Anthropic.
 
 ## Advanced Usage
 
