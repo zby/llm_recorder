@@ -1,6 +1,6 @@
 from typing import Dict, Any, Optional
 from pathlib import Path
-from ..llm_replay import ReplayLLM
+from ..llm_recorder import LLMRecorder
 
 from functools import cached_property
 
@@ -16,8 +16,8 @@ except ImportError:
     )
 
 
-class OpenAIReplayLLM(ReplayLLM):
-    """Implementation of ReplayLLM for OpenAI"""
+class OpenAILLMRecorder(LLMRecorder):
+    """Implementation of LLMRecorder for OpenAI"""
     def __init__(self, original_create, **kwargs):
         super().__init__(**kwargs)
         self._original_create = original_create
@@ -36,13 +36,13 @@ class OpenAIReplayLLM(ReplayLLM):
         return model_response.model_dump()
 
 
-class ReplayCompletions(completions.Completions):
-    """Subclass of OpenAI Completions that uses ReplayLLM for create calls"""
+class CompletionsRecorder(completions.Completions):
+    """Subclass of OpenAI Completions that uses LLMRecorder for create calls"""
     def __init__(self, client: OpenAI, replay_dir: str | Path, save_dir: Optional[str | Path] = None, replay_count: int = 0, **kwargs):
         super().__init__(client=client, **kwargs)
         # Store the original create method before we override it
         original_create = super().create
-        self._replay_llm = OpenAIReplayLLM(
+        self._replay_llm = OpenAILLMRecorder(
             original_create=original_create,
             replay_dir=replay_dir,
             save_dir=save_dir,
@@ -54,8 +54,8 @@ class ReplayCompletions(completions.Completions):
         return response
 
 
-class ReplayChat(chat.Chat):
-    """Subclass of OpenAI Chat that uses ReplayCompletions"""
+class ChatRecorder(chat.Chat):
+    """Subclass of OpenAI Chat that uses LLMRecorder for create calls"""
     def __init__(self,
                  client: OpenAI,
                  replay_dir: str | Path,
@@ -67,8 +67,8 @@ class ReplayChat(chat.Chat):
         self._replay_count = replay_count
 
     @cached_property
-    def completions(self) -> ReplayCompletions:
-        return ReplayCompletions(
+    def completions(self) -> CompletionsRecorder:
+        return CompletionsRecorder(
             self._client,
             replay_dir=self._replay_dir,
             save_dir=self._save_dir,
@@ -76,7 +76,7 @@ class ReplayChat(chat.Chat):
         )
 
 
-class ReplayOpenAI(OpenAI):
+class OpenAIRecorder(OpenAI):
     """OpenAI client that supports replaying chat completions"""
     def __init__(
         self,
@@ -97,7 +97,7 @@ class ReplayOpenAI(OpenAI):
         super().__init__(**kwargs)
         
         # Create new chat instance with replay support
-        self.chat = ReplayChat(
+        self.chat = ChatRecorder(
             client=self,
             replay_dir=replay_dir,
             save_dir=save_dir,
