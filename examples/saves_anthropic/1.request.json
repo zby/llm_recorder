@@ -1,0 +1,11 @@
+{
+  "model": "claude-3-haiku-20240307",
+  "messages": [
+    {
+      "role": "user",
+      "content": "Give me a one-sentence story about a cat (response #1)"
+    }
+  ],
+  "max_tokens": 128,
+  "temperature": 0.7
+}

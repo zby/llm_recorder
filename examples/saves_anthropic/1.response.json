@@ -1,0 +1,20 @@
+{
+  "id": "msg_018RP66trspRZ4Ed8EXip6BL",
+  "content": [
+    {
+      "text": "The curious cat prowled around the house, its whiskers twitching as it sniffed out the next adventure.",
+      "type": "text"
+    }
+  ],
+  "model": "claude-3-haiku-20240307",
+  "role": "assistant",
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "input_tokens": 22,
+    "output_tokens": 28
+  }
+}

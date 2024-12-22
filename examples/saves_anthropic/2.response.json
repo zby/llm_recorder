@@ -1,0 +1,20 @@
+{
+  "id": "msg_01AM4cbAyJUcf4snGbMbWU2v",
+  "content": [
+    {
+      "text": "The cat, with its piercing green eyes and soft, fluffy fur, curled up on the windowsill, watching the world go by with a serene and content expression.",
+      "type": "text"
+    }
+  ],
+  "model": "claude-3-haiku-20240307",
+  "role": "assistant",
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "input_tokens": 22,
+    "output_tokens": 41
+  }
+}

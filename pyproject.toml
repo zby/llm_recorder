@@ -20,6 +20,7 @@ license = {text = "MIT"}
 openai = [
     "openai>=1.0.0",
 ]
+anthropic = ["anthropic"]
 
 [project.urls]
 Homepage = "https://github.com/zby/llm_recorder"
