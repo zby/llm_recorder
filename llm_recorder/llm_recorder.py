@@ -53,6 +53,7 @@ class LLMRecorder(ABC):
             replay_count: Number of interactions to replay.
                         After these are exhausted, live LLM calls will be made.
         """
+        self.completion_arg_names = []  # todo: make this cleaner
         self.replay_dir = Path(replay_dir)
         if replay_count > 0 and not self.replay_dir.exists():
             raise FileNotFoundError(f"Replay directory not found: {self.replay_dir}")
