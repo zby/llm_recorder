@@ -4,7 +4,7 @@ from llm_recorder.providers.openai_recorder import OpenAIRecorder
 # Note: This example assumes that you have set OPENAI_API_KEY in your environment.
 
 client = OpenAIRecorder(
-    replay_dir="examples/saves_openai",
+    replay_dir="examples/saves/openai",
     replay_count=2  # Will replay first 2 interactions, then make live calls
 )
 # client is now a replacement for the OpenAI client

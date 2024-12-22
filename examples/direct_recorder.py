@@ -7,7 +7,7 @@ MODEL = "gpt-4o-mini"
 def main():
     # Initialize the recorder
     recorder = LiteLLMRecorder(
-        replay_dir="examples/saves_direct",
+        replay_dir="examples/saves/direct",
         replay_count=1  # Set to 0 to make live calls, or N to replay N recordings
     )
 

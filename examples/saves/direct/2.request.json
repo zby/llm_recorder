@@ -1,0 +1,9 @@
+{
+  "model": "gpt-4o-mini",
+  "messages": [
+    {
+      "role": "user",
+      "content": "Write a short explanation of this haiku: Lines of code dancing\nInstructions in binary\nCreating new worlds"
+    }
+  ]
+}

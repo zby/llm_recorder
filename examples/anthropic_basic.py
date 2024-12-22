@@ -5,8 +5,8 @@ MODEL = "claude-3-haiku-20240307"
 
 client = ReplayAnthropic(
     api_key=os.environ["ANTHROPIC_API_KEY"],
-    replay_dir="examples/saves_anthropic",
-    save_dir="examples/saves_anthropic",
+    replay_dir="examples/saves/anthropic",
+    save_dir="examples/saves/anthropic",
     replay_count=2
 )
 # Make some API calls

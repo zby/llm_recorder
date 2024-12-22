@@ -8,7 +8,7 @@ import litellm
 # - ANTHROPIC_API_KEY for Anthropic models
 
 
-enable_replay_mode(replay_dir="saves")
+enable_replay_mode(replay_dir="examples/saves/basic")
 
 print("After patching:", litellm.completion.__name__)
 
@@ -19,4 +19,4 @@ response = litellm.completion(
     messages=[{ "content": "Hello, how are you?","role": "user"}]
 )
 
-# Now the request and response are recorded in the saves directory
+# Now the request and response are recorded in the examples/saves/basic directory

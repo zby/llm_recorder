@@ -1,4 +1,3 @@
-import os
 from llm_recorder import enable_replay_mode
 import litellm
 
@@ -12,13 +11,11 @@ import litellm
 # - OPENAI_API_KEY for OpenAI models
 # - ANTHROPIC_API_KEY for Anthropic models
 
-#MODEL = "openai/gpt-4o-mini"
-MODEL = "anthropic/claude-3-5-sonnet-20240620"
+MODEL = "openai/gpt-4o-mini"
+#MODEL = "anthropic/claude-3-5-sonnet-20240620"
 
-script_dir = os.path.dirname(os.path.abspath(__file__))
-saves_dir = os.path.join(script_dir, "saves")
 
-enable_replay_mode(replay_dir=saves_dir, replay_count=1)
+enable_replay_mode(replay_dir="examples/saves/chained_calls", replay_count=0)
 # replay_count=1 means that the first call will be replayed and the second will be live
 
 # System message to set the context for our interaction
