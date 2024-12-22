@@ -63,10 +63,11 @@ The saved response was from OpenAI, but the second call is now directed to Anthr
 ## Advanced Usage
 
 For more fine-grained control instantiate and use the LiteLLMRecorder class directly.
+See [examples/direct_recorder.py](examples/direct_recorder.py).
 
 ## Limitations
 
-- Currently only works with litellm. There is experimental support of direct use with OpenAI (see [examples/openai_basic.py](examples/openai_basic.py)).
+- Currently only works with litellm. The support of direct use with OpenAI (see [examples/openai_basic.py](examples/openai_basic.py)) is experimental.
 - Only supports synchronous calls.
 
 ## Contributing
