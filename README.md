@@ -24,7 +24,7 @@ pip install llm_recorder
 
 For a quick start use `enable_replay_mode`; it monkey patches `litellm` to record and replay responses.
 
-By default `llm_recorder` records any calls to `litellm.completion` and stores them in the specified `save_dir`.
+By default `llm_recorder` records any calls to `litellm.completion` and their responses and stores them in the specified `save_dir`.
 If no `save_dir` is specified, it will use the `replay_dir`.
 
 Specify `replay_count` to replay previously recorded interactions.
