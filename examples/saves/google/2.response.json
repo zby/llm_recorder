@@ -1,0 +1,25 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "The ginger cat, ignoring the frantic meows of its siblings, nonchalantly batted a priceless Ming vase from the shelf, then curled up for a nap amidst the shattered porcelain.\n"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "avg_logprobs": -0.19431711567772758,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": []
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 11,
+    "candidates_token_count": 36,
+    "total_token_count": 47,
+    "cached_content_token_count": 0
+  }
+}

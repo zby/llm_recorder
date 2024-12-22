@@ -110,7 +110,14 @@ class LLMRecorder(ABC):
         """Convert a model response object to a dictionary"""
         pass
 
-    def completion(self, **kwargs) -> Any:
+
+    def completion(self, *args, **kwargs) -> Any:
+        if self.completion_arg_names:
+            i = 0
+            for name in self.completion_arg_names:
+                if name not in kwargs:
+                    kwargs[name] = args[i]
+                    i += 1
         if self.replay_index < len(self.interactions):
             # If we have replay interactions available, use them
             interaction = self.interactions[self.replay_index]

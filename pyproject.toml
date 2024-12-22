@@ -21,6 +21,7 @@ openai = [
     "openai>=1.0.0",
 ]
 anthropic = ["anthropic"]
+google = ["google-generativeai"]
 
 [project.urls]
 Homepage = "https://github.com/zby/llm_recorder"
