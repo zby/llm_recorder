@@ -57,7 +57,7 @@ Then have a look at the 'saves' directory to see the recorded interactions.
 
 ### Chained Calls Example
 See [examples/chained_calls.py](examples/chained_calls.py) for an example of how to use `llm_recorder` to record and replay chained LLM calls.
-I saved the first response in [examples/saves/1.response.json](examples/saves/1.response.json) and the example
+I saved the first response in [examples/saves/chained_calls/1.response.json](examples/saves/chained_calls/1.response.json) and the example
 replays it before making another live call.
 The saved response was from OpenAI, but the second call is directed to Anthropic.
 
