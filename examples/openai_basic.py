@@ -1,18 +1,13 @@
 import os
-from openai import OpenAI
-from llm_recorder.openai_replay import openai_enable_replay_mode
+from llm_recorder.providers.openai_recorder import ReplayOpenAI
 
 # Note: This example assumes that you have set OPENAI_API_KEY in your environment.
 
-# Create the OpenAI client
-client = OpenAI()
-
-# Enable replay mode
-client = openai_enable_replay_mode(
-    client=client,
+client = ReplayOpenAI(
     replay_dir="examples/saves_openai",
     replay_count=2  # Will replay first 2 interactions, then make live calls
 )
+# client is now a replacement for the OpenAI client
 
 # Make some API calls
 for i in range(3):

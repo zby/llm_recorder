@@ -1,12 +1,8 @@
 # llm_recorder
 
-`llm_recorder` is a basic local observability and debugging tool for language model apps
-- it helps you record and replay interactions with LLMs.
+`llm_recorder` is a basic observability and debugging tool for language model apps.
+It stores interactions with LLMs in a local directory and provides a way to replay them.
 It is particularly useful for debugging chained LLM calls.
-
-Currently it works via [litellm](https://github.com/BerriAI/litellm),
-but there is an experimental mode that works directly with the OpenAI client.
-See [examples/openai_basic.py](examples/openai_basic.py).
 
 With `llm_recorder`, you can:
 
@@ -15,16 +11,8 @@ With `llm_recorder`, you can:
 
 You can use it to:
 - Inspect LLM responses and requests that lead to them
-- Record an execution path that leads to a specific response and then replay it and see how the downstream application behaves
+- Record an execution path that leads to a specific response and then replay it and see how the application behaves downstream
 - Modify the recorded responses before replaying them
-
-## Features
-
-- **Seamless Integration with [litellm](https://github.com/BerriAI/litellm):**
-  Start recording and replaying interactions by just calling `enable_replay_mode()`.
-  
-- **Local Storage:**  
-  Recorded interactions are stored as JSON files, making it easy to inspect, modify or share them.
 
 ## Installation
 
@@ -74,7 +62,12 @@ The saved response was from OpenAI, but the second call is now directed to Anthr
 
 ## Advanced Usage
 
-For more fine-grained control instantiate and use the ReplayLiteLLM class directly.
+For more fine-grained control instantiate and use the LiteLLMRecorder class directly.
+
+## Limitations
+
+- Currently only works with litellm. There is experimental support of direct use with OpenAI (see [examples/openai_basic.py](examples/openai_basic.py)).
+- Only supports synchronous calls.
 
 ## Contributing
 
