@@ -7,24 +7,24 @@ client = ReplayAnthropic(
     api_key=os.environ["ANTHROPIC_API_KEY"],
     replay_dir="examples/saves/anthropic",
     save_dir="examples/saves/anthropic",
-    replay_count=2
+    replay_count=2,
 )
 # Make some API calls
 for i in range(3):
     print(f"\nCall {i + 1}:")
-    
-    message= client.messages.create(
+
+    message = client.messages.create(
         model=MODEL,
         messages=[
             {
                 "role": "user",
-                "content": f"Give me a one-sentence story about a cat (response #{i + 1})"
+                "content": f"Give me a one-sentence story about a cat (response #{i + 1})",
             }
         ],
         max_tokens=128,
         temperature=0.7,
     )
-    
+
     print(f"Content: {message.content}")
     print(f"Model: {message.model}")
-    print(f"Finish reason: {message.stop_reason}") 
+    print(f"Finish reason: {message.stop_reason}")

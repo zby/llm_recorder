@@ -16,7 +16,7 @@ print("After patching:", litellm.completion.__name__)
 
 response = litellm.completion(
     model="openai/gpt-4o-mini",
-    messages=[{ "content": "Hello, how are you?","role": "user"}]
+    messages=[{"content": "Hello, how are you?", "role": "user"}],
 )
 
 # Now the request and response are recorded in the examples/saves/basic directory

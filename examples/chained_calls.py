@@ -11,7 +11,7 @@ import litellm
 # - OPENAI_API_KEY for OpenAI models
 # - ANTHROPIC_API_KEY for Anthropic models
 
-#MODEL = "openai/gpt-4o-mini"
+# MODEL = "openai/gpt-4o-mini"
 MODEL = "anthropic/claude-3-5-sonnet-20240620"
 
 
@@ -22,7 +22,7 @@ enable_replay_mode(replay_dir="examples/saves/chained_calls", replay_count=1)
 system_message = {
     "role": "system",
     "content": """You are a knowledgeable teacher who first suggests interesting topics to learn about,
-then provides short explanations about the chosen topic. Please keep the explanations to 3 sentences or less."""
+then provides short explanations about the chosen topic. Please keep the explanations to 3 sentences or less.""",
 }
 
 # First request: Get a topic suggestion
@@ -32,9 +32,9 @@ first_response = litellm.completion(
         system_message,
         {
             "role": "user",
-            "content": "Suggest an interesting scientific topic that most people don't know about. Keep it to one sentence."
-        }
-    ]
+            "content": "Suggest an interesting scientific topic that most people don't know about. Keep it to one sentence.",
+        },
+    ],
 )
 
 # Extract the topic from the first response
@@ -49,20 +49,17 @@ second_response = litellm.completion(
         system_message,
         {
             "role": "user",
-            "content": "Suggest an interesting scientific topic that most people don't know about. Keep it to one sentence."
+            "content": "Suggest an interesting scientific topic that most people don't know about. Keep it to one sentence.",
         },
-        {
-            "role": "assistant",
-            "content": suggested_topic
-        },
+        {"role": "assistant", "content": suggested_topic},
         {
             "role": "user",
-            "content": f"That's interesting! Can you explain {suggested_topic} in more detail? Give me 3 fascinating facts about it."
-        }
-    ]
+            "content": f"That's interesting! Can you explain {suggested_topic} in more detail? Give me 3 fascinating facts about it.",
+        },
+    ],
 )
 
 print("\nDetailed explanation:")
 print(second_response.choices[0].message.content)
 
-# Both requests and responses will be saved in the ./saves directory 
+# Both requests and responses will be saved in the ./saves directory

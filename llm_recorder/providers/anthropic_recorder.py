@@ -7,7 +7,7 @@ from pprint import pprint
 try:
     import anthropic
     from anthropic import Anthropic
-    from anthropic.types import Message 
+    from anthropic.types import Message
 except ImportError:
     raise ImportError(
         "Anthropic provider requires the 'anthropic' package. "
@@ -17,6 +17,7 @@ except ImportError:
 
 class AnthropicReplayLLM(LLMRecorder):
     """Implementation of LLMRecorder for Anthropic"""
+
     def __init__(self, original_create, **kwargs):
         super().__init__(**kwargs)
         self._original_create = original_create
@@ -26,7 +27,7 @@ class AnthropicReplayLLM(LLMRecorder):
         pprint(kwargs)
         response = self._original_create(**kwargs)
         return response
-    
+
     def dict_to_model_response(self, dict_response: Dict[str, Any]) -> Message:
         """Convert a dictionary back to a model response object"""
         return Message.model_validate(dict_response)
@@ -38,7 +39,14 @@ class AnthropicReplayLLM(LLMRecorder):
 
 class ReplayMessages:
     """Wrapper for Anthropic messages that uses LLMRecorder for create calls"""
-    def __init__(self, client: Anthropic, replay_dir: str | Path, save_dir: Optional[str | Path] = None, replay_count: int = 0):
+
+    def __init__(
+        self,
+        client: Anthropic,
+        replay_dir: str | Path,
+        save_dir: Optional[str | Path] = None,
+        replay_count: int = 0,
+    ):
         self._client = client
         # Store the original create method
         self._original_create = client.messages.create
@@ -46,7 +54,7 @@ class ReplayMessages:
             original_create=self._original_create,
             replay_dir=replay_dir,
             save_dir=save_dir,
-            replay_count=replay_count
+            replay_count=replay_count,
         )
 
     def create(self, **kwargs) -> Message:
@@ -57,16 +65,17 @@ class ReplayMessages:
 
 class ReplayAnthropic(Anthropic):
     """Anthropic client that supports replaying messages"""
+
     def __init__(
         self,
         replay_dir: str | Path,
         save_dir: Optional[str | Path] = None,
         replay_count: int = 0,
-        **kwargs
+        **kwargs,
     ):
         """
         Initialize ReplayAnthropic.
-        
+
         Args:
             replay_dir: Directory to load interactions from
             save_dir: Optional directory to save new interactions. If None, saves to replay_dir
@@ -74,11 +83,11 @@ class ReplayAnthropic(Anthropic):
             **kwargs: Additional arguments passed to Anthropic client
         """
         super().__init__(**kwargs)
-        
+
         # Create messages instance with replay support
         self.messages = ReplayMessages(
             client=self,
             replay_dir=replay_dir,
             save_dir=save_dir,
-            replay_count=replay_count
-        ) 
+            replay_count=replay_count,
+        )

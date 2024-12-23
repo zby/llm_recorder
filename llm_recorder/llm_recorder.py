@@ -8,6 +8,7 @@ from abc import ABC, abstractmethod
 
 logger = logging.getLogger(__name__)
 
+
 @dataclass
 class LLMInteraction:
     timestamp: str
@@ -16,26 +17,25 @@ class LLMInteraction:
 
     def save_to_directory(self, directory: Path, index: int) -> None:
         """Save request and response as separate files in the given directory"""
-        with open(directory / f"{index}.request.json", 'w') as f:
+        with open(directory / f"{index}.request.json", "w") as f:
             json.dump(self.request, f, indent=2)
-            
-        with open(directory / f"{index}.response.json", 'w') as f:
+
+        with open(directory / f"{index}.response.json", "w") as f:
             json.dump(self.response, f, indent=2)
 
     @classmethod
-    def load_from_directory(cls, directory: Path, index: int) -> 'LLMInteraction':
+    def load_from_directory(cls, directory: Path, index: int) -> "LLMInteraction":
         """Load request and response from separate files"""
         with open(directory / f"{index}.request.json") as f:
             request = json.load(f)
-            
+
         with open(directory / f"{index}.response.json") as f:
             response = json.load(f)
-            
+
         return cls(
-            timestamp=datetime.now().isoformat(),
-            request=request,
-            response=response
+            timestamp=datetime.now().isoformat(), request=request, response=response
         )
+
 
 class LLMRecorder(ABC):
     def __init__(
@@ -46,7 +46,7 @@ class LLMRecorder(ABC):
     ):
         """
         Initialize ReplayLLM.
-        
+
         Args:
             replay_dir: Directory to load interactions from
             save_dir: Optional directory to save new interactions. If None, saves to replay_dir
@@ -59,21 +59,23 @@ class LLMRecorder(ABC):
             raise FileNotFoundError(f"Replay directory not found: {self.replay_dir}")
         if self.replay_dir.exists() and not self.replay_dir.is_dir():
             raise ValueError(f"replay_dir must be a directory: {self.replay_dir}")
-        
+
         self.save_dir = Path(save_dir) if save_dir else self.replay_dir
         if self.save_dir.exists() and not self.save_dir.is_dir():
             raise ValueError(f"save_dir must be a directory: {self.save_dir}")
-        
+
         # Create save_dir if it doesn't exist
         self.save_dir.mkdir(parents=True, exist_ok=True)
-        
+
         self.replay_count = replay_count
         self.replay_index = 0
         self.interactions: List[LLMInteraction] = []
-        
+
         self._load_interactions()
         if replay_count > len(self.interactions):
-            raise ValueError(f"replay_count is greater than the number of interactions in replay_dir: {len(self.interactions)}")
+            raise ValueError(
+                f"replay_count is greater than the number of interactions in replay_dir: {len(self.interactions)}"
+            )
 
         for file in self.save_dir.glob("*.json"):
             file.unlink()
@@ -81,19 +83,19 @@ class LLMRecorder(ABC):
     def _load_interactions(self) -> None:
         """Load interactions from replay directory"""
         request_files = sorted(self.replay_dir.glob("*.request.json"))
-        
-        for i, _ in enumerate(request_files[:self.replay_count], 1):
+
+        for i, _ in enumerate(request_files[: self.replay_count], 1):
             try:
                 interaction = LLMInteraction.load_from_directory(self.replay_dir, i)
                 self.interactions.append(interaction)
             except FileNotFoundError as e:
                 logger.warning(f"Incomplete interaction {i}: {e}")
-                
+
     def _save_interaction(self, interaction: LLMInteraction) -> None:
         """Save an interaction to save directory"""
         existing_files = list(self.save_dir.glob("*.request.json"))
         next_index = len(existing_files) + 1
-        
+
         interaction.save_to_directory(self.save_dir, next_index)
 
     @abstractmethod
@@ -111,7 +113,6 @@ class LLMRecorder(ABC):
         """Convert a model response object to a dictionary"""
         pass
 
-
     def completion(self, *args, **kwargs) -> Any:
         if self.completion_arg_names:
             i = 0
@@ -123,16 +124,18 @@ class LLMRecorder(ABC):
             # If we have replay interactions available, use them
             interaction = self.interactions[self.replay_index]
             self.replay_index += 1
-            logger.info(f"Replaying interaction {self.replay_index} of {len(self.interactions)}")
+            logger.info(
+                f"Replaying interaction {self.replay_index} of {len(self.interactions)}"
+            )
         else:
             # Otherwise make a live call
             response = self.make_live_call(**kwargs)
             interaction = LLMInteraction(
                 timestamp=datetime.now().isoformat(),
                 request=kwargs,
-                response=self.model_response_to_dict(response)
+                response=self.model_response_to_dict(response),
             )
             logger.info("Making live LLM call")
-        
+
         self._save_interaction(interaction)
-        return self.dict_to_model_response(interaction.response) 
+        return self.dict_to_model_response(interaction.response)

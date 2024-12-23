@@ -1,10 +1,11 @@
-from typing import Callable, Dict, Any, Optional
+from typing import Dict, Any, Optional
 import litellm
 from ..llm_recorder import LLMRecorder
 from pathlib import Path
 
 # this is for monkey patching
-_rllm_instance: Optional['LLMRecorder'] = None
+_rllm_instance: Optional["LLMRecorder"] = None
+
 
 def enable_replay_mode(
     replay_dir: str | Path,
@@ -13,7 +14,7 @@ def enable_replay_mode(
 ) -> None:
     """
     Enable replay mode by creating a LiteLLMRecorder instance and monkey-patching litellm.completion.
-    
+
     Args:
         replay_dir: Directory to load interactions from.
         save_dir: Directory to save new interactions. Defaults to replay_dir if None.
@@ -36,16 +37,21 @@ def enable_replay_mode(
 
     litellm.completion = patched_completion
 
+
 class LiteLLMRecorder(LLMRecorder):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.completion_function = litellm.completion
-    
+
     def make_live_call(self, **kwargs) -> Any:
         return self.completion_function(**kwargs)
 
-    def dict_to_model_response(self, dict_response: Dict[str, Any]) -> litellm.ModelResponse:
+    def dict_to_model_response(
+        self, dict_response: Dict[str, Any]
+    ) -> litellm.ModelResponse:
         return litellm.ModelResponse(**dict_response)
 
-    def model_response_to_dict(self, model_response: litellm.ModelResponse) -> Dict[str, Any]:
-        return model_response.model_dump() 
+    def model_response_to_dict(
+        self, model_response: litellm.ModelResponse
+    ) -> Dict[str, Any]:
+        return model_response.model_dump()
