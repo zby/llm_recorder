@@ -1,9 +1,0 @@
-{
-  "model": "gpt-3.5-turbo",
-  "messages": [
-    {
-      "role": "user",
-      "content": "Write a haiku about coding"
-    }
-  ]
-}

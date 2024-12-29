@@ -24,14 +24,12 @@ pip install llm_recorder
 
 For a quick start use `enable_replay_mode`; it monkey patches `litellm` to record and replay responses.
 
-By default `llm_recorder` records any calls to `litellm.completion` and their responses and stores them in the specified `save_dir`.
-If no `save_dir` is specified, it will use the `replay_dir`.
+`llm_recorder` records any calls to `litellm.completion` and their responses and stores them in the directory specified by `store_path`.
 
 Specify `replay_count` to replay previously recorded interactions.
 Once the replayed interactions are exhausted, `llm_recorder` falls back to live LLM calls.
 
-The `save_dir` is cleaned up at the start of each run, but `replay_dir` is read before that cleanup
-so if they are the same directory, you can still replay the old interactions.
+The `store_path` is cleaned up at the start of each run, but interactions from the previous run are read before that cleanup.
 
 
 ### Basic Example
@@ -42,7 +40,7 @@ from llm_recorder import enable_replay_mode
 import litellm
 
 
-enable_replay_mode(replay_dir="saves")
+enable_replay_mode(="saves")
 
 print("After:", litellm.completion.__name__)
 
@@ -57,9 +55,8 @@ Then have a look at the 'saves' directory to see the recorded interactions.
 
 ### Chained Calls Example
 See [examples/chained_calls.py](examples/chained_calls.py) for an example of how to use `llm_recorder` to record and replay chained LLM calls.
-I saved the first response in [examples/saves/chained_calls/1.response.json](examples/saves/chained_calls/1.response.json) and the example
-replays it before making another live call.
-The saved response was from OpenAI, but the second call is directed to Anthropic.
+I saved the first two interactions in [examples/saves/chained_calls/](examples/saves/chained_calls/) and the example
+replays them before making another live call.
 
 ## Advanced Usage
 
@@ -68,7 +65,7 @@ See [examples/direct_recorder.py](examples/direct_recorder.py).
 
 ## Limitations
 
-- Currently only works with litellm. The support of direct use with OpenAI (see [examples/openai_basic.py](examples/openai_basic.py)) is experimental.
+- Currently only works with litellm. I've added support for other SDKs and also for storing http messages directly - but it is all experimental.
 - Only supports synchronous calls.
 
 ## Contributing

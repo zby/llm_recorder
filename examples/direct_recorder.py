@@ -1,21 +1,23 @@
 from pathlib import Path
 import litellm
-from llm_recorder.providers.litellm_recorder import LiteLLMRecorder
+from llm_recorder.providers.litellm_recorder import LitellmRecorder
 
 MODEL = "gpt-4o-mini"
+MODEL = "anthropic/claude-3-5-haiku-20240307"
 
+MODEL = "anthropic/claude-3-5-sonnet-20240620"
 
 def main():
     # Initialize the recorder
-    recorder = LiteLLMRecorder(
-        replay_dir="examples/saves/direct",
-        replay_count=1,  # Set to 0 to make live calls, or N to replay N recordings
+    recorder = LitellmRecorder(
+        store_path="examples/saves/direct",
+        replay_count=2,  # Set to 0 to make live calls, or N to replay N recordings
     )
 
     # First call
     response1 = recorder.completion(
         model=MODEL,
-        messages=[{"role": "user", "content": "Write a haiku about coding"}],
+        messages=[{"role": "user", "content": "Write a haiku about coding. Please don't explain it."}],
     )
     print("\nFirst response:")
     print(response1.choices[0].message.content)
