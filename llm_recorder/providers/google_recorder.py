@@ -43,7 +43,7 @@ class RecorderGenerativeModel(GenerativeModel, LLMRecorder):
         """Make a live API call to Google"""
         response = super().generate_content(**kwargs)
         return response
-    
+
     def req_to_dict(self, req: Dict[str, Any]) -> Dict[str, Any]:
         """Convert a request to a dictionary"""
         return req
@@ -60,4 +60,3 @@ class RecorderGenerativeModel(GenerativeModel, LLMRecorder):
         """Convert a dictionary back to a model response object"""
         response = protos.GenerateContentResponse(**dict_response)
         return GenerateContentResponse.from_response(response)
-

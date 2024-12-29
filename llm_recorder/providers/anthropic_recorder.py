@@ -32,7 +32,6 @@ class ReplayMessages(Messages, LLMRecorder):
             replay_count=replay_count,
         )
 
-
     def live_call(self, **kwargs) -> Message:
         """Make a live API call to Anthropic"""
         response = super().create(**kwargs)
@@ -76,4 +75,3 @@ class ReplayAnthropic(Anthropic):
             store_path=store_path,
             replay_count=replay_count,
         )
-

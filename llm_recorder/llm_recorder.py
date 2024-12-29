@@ -18,20 +18,19 @@ class LLMInteraction:
 
 
 class Persistence(Protocol):
-    def load_all(self, limit: int) -> List[LLMInteraction]:
-        ...
-    def save(self, interaction: LLMInteraction) -> None:
-        ...
+    def load_all(self, limit: int) -> List[LLMInteraction]: ...
+    def save(self, interaction: LLMInteraction) -> None: ...
 
 
 class FilePersistence:
     """
     A file-based persistence layer that saves each LLMInteraction
-    in separate JSON files: 
+    in separate JSON files:
       - 1.request.json
       - 1.response.json
       - etc.
     """
+
     def __init__(self, directory: Path):
         self.directory = directory
         self.directory.mkdir(parents=True, exist_ok=True)
@@ -43,7 +42,7 @@ class FilePersistence:
         request_files = sorted(self.directory.glob("*.request_*.json"))
 
         # Get unique indices from request files
-        unique_indices = {int(f.name.split('.')[0]) for f in request_files}
+        unique_indices = {int(f.name.split(".")[0]) for f in request_files}
         sorted_indices = sorted(unique_indices)
 
         for i in sorted_indices[:limit]:
@@ -87,9 +86,9 @@ class FilePersistence:
         request_data = {}
         for file in request_files:
             # First get the part after 'request_'
-            after_prefix = str(file).split('request_')[1]
+            after_prefix = str(file).split("request_")[1]
             # Then remove the '.json' suffix
-            key = after_prefix.rsplit('.json', 1)[0]
+            key = after_prefix.rsplit(".json", 1)[0]
             with file.open("r") as f:
                 request_data[key] = json.load(f)
 
@@ -97,17 +96,16 @@ class FilePersistence:
         response_data = {}
         for file in response_files:
             # First get the part after 'response_'
-            after_prefix = str(file).split('response_')[1]
+            after_prefix = str(file).split("response_")[1]
             # Then remove the '.json' suffix
-            key = after_prefix.rsplit('.json', 1)[0]
+            key = after_prefix.rsplit(".json", 1)[0]
             with file.open("r") as f:
                 response_data[key] = json.load(f)
 
         return LLMInteraction(
-            timestamp="",
-            request=request_data,
-            response=response_data
+            timestamp="", request=request_data, response=response_data
         )
+
 
 class LLMRecorder(ABC):
     """
@@ -119,7 +117,7 @@ class LLMRecorder(ABC):
         self,
         store_path: Union[str, Path],
         replay_count: int = 0,
-        persistence: Optional["Persistence"] = None
+        persistence: Optional["Persistence"] = None,
     ):
         """
         Initialize an LLMRecorder.
@@ -145,7 +143,9 @@ class LLMRecorder(ABC):
         self.replay_index = 0
 
         # Load existing interactions (up to replay_count) from the persistence layer
-        self.interactions: List[LLMInteraction] = self.persistence.load_all(limit=self.replay_count)
+        self.interactions: List[LLMInteraction] = self.persistence.load_all(
+            limit=self.replay_count
+        )
         if replay_count > len(self.interactions):
             raise ValueError(
                 f"replay_count ({replay_count}) > available interactions ({len(self.interactions)})"
@@ -157,7 +157,6 @@ class LLMRecorder(ABC):
         Make a live call to the LLM.
         """
         pass
-
 
     @abstractmethod
     def req_to_dict(self, req: Any) -> Dict[str, Any]:
@@ -173,7 +172,7 @@ class LLMRecorder(ABC):
         """
         pass
 
-    def dict_completion(self, **kwargs) -> Dict[str, Any] :
+    def dict_completion(self, **kwargs) -> Dict[str, Any]:
         """
         Either replay a saved interaction or make a new call (which is recorded).
         """
@@ -196,6 +195,7 @@ class LLMRecorder(ABC):
 
         return interaction.response
 
+
 if __name__ == "__main__":
 
     class ExampleLLMRecorder(LLMRecorder):
@@ -215,47 +215,42 @@ if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
 
     # Example 1: Recording new interactions
-    recorder = ExampleLLMRecorder(
-        store_path="./example_logs"
-    )
+    recorder = ExampleLLMRecorder(store_path="./example_logs")
 
     # Make some example calls that will be recorded
     result1 = recorder.completion(
         prompt="What is the capital of France?",
         temperature=0.7,
-        headers={"Authorization": "Bearer sk-..."}
+        headers={"Authorization": "Bearer sk-..."},
     )
     print("First call result:", result1)
 
     result2 = recorder.completion(
         prompt="What is the capital of Japan?",
         temperature=0.7,
-        headers={"Authorization": "Bearer sk-..."}
+        headers={"Authorization": "Bearer sk-..."},
     )
     print("Second call result:", result2)
 
     # Example 2: Replaying recorded interactions
     replay_recorder = ExampleLLMRecorder(
         store_path="./example_logs",
-        replay_count=2  # Replay the two interactions we just recorded
+        replay_count=2,  # Replay the two interactions we just recorded
     )
 
     # These calls will use the recorded responses instead of making live calls
     replay1 = replay_recorder.completion(
-        prompt="This prompt will be ignored because we're replaying",
-        temperature=0.5
+        prompt="This prompt will be ignored because we're replaying", temperature=0.5
     )
     print("First replay:", replay1)
 
     replay2 = replay_recorder.completion(
-        prompt="This prompt will also be ignored",
-        temperature=0.5
+        prompt="This prompt will also be ignored", temperature=0.5
     )
     print("Second replay:", replay2)
 
     # After replay_count is exhausted, this will make a live call
     live_call = replay_recorder.completion(
-        prompt="This will make a live call",
-        temperature=0.5
+        prompt="This will make a live call", temperature=0.5
     )
     print("Live call after replays:", live_call)

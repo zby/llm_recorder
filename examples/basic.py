@@ -20,6 +20,6 @@ response = litellm.completion(
 )
 
 print(response)
-#print(response.choices[0].message.content)
+# print(response.choices[0].message.content)
 
 # Now the request and response are recorded in the examples/saves/basic directory

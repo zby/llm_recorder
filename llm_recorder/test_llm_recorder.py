@@ -43,16 +43,14 @@ def create_interaction_files(directory: Path, request: dict, response: dict):
     """Helper to create interaction files in a directory"""
     persistence = FilePersistence(directory)
     interaction = LLMInteraction(
-        timestamp=datetime.now().isoformat(),
-        request=request,
-        response=response
+        timestamp=datetime.now().isoformat(), request=request, response=response
     )
     persistence.save(interaction)
 
 
 def test_save_and_load_interaction(temp_dir):
     persistence = FilePersistence(temp_dir)
-    
+
     interaction = LLMInteraction(
         timestamp="2024-01-01T00:00:00",
         request={
@@ -67,7 +65,7 @@ def test_save_and_load_interaction(temp_dir):
 
     # Load all interactions (limit=1 since we only saved one)
     loaded_interactions = persistence.load_all(limit=1)
-    
+
     assert len(loaded_interactions) == 1
     loaded = loaded_interactions[0]
 
@@ -133,8 +131,12 @@ def test_replay_llm_saves_interactions(temp_dir, sample_request):
     llm.dict_completion(**sample_request)
 
     # Check that files were saved
-    assert list(temp_dir.glob("1.request_*.json"))  # Should find at least one request file
-    assert list(temp_dir.glob("1.response_*.json"))  # Should find at least one response file
+    assert list(
+        temp_dir.glob("1.request_*.json")
+    )  # Should find at least one request file
+    assert list(
+        temp_dir.glob("1.response_*.json")
+    )  # Should find at least one response file
 
 
 def test_replay_llm_invalid_replay_count(temp_dir, sample_request, sample_response):
