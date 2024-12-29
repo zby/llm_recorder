@@ -10,7 +10,7 @@ def main():
     # Initialize the recorder
     recorder = LitellmRecorder(
         store_path="examples/saves/direct",
-        replay_count=2,  # Set to 0 to make live calls, or N to replay N recordings
+        replay_count=1,  # Set to 0 to make live calls, or N to replay N recordings
     )
 
     # First call

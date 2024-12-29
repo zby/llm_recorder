@@ -55,8 +55,8 @@ Then have a look at the 'saves' directory to see the recorded interactions.
 
 ### Chained Calls Example
 See [examples/chained_calls.py](examples/chained_calls.py) for an example of how to use `llm_recorder` to record and replay chained LLM calls.
-I saved the first two interactions in [examples/saves/chained_calls/](examples/saves/chained_calls/) and the example
-replays them before making another live call.
+I saved the first interaction in [examples/saves/chained_calls/](examples/saves/chained_calls/) and the example
+replays it before making live calls.
 
 ## Advanced Usage
 
