@@ -16,51 +16,37 @@ except ImportError:
     )
 
 
-class OpenAILLMRecorder(LLMRecorder):
-    """Implementation of LLMRecorder for OpenAI"""
-
-    def __init__(self, original_create, **kwargs):
-        super().__init__(**kwargs)
-        self._original_create = original_create
-
-    def make_live_call(self, **kwargs) -> ChatCompletion:
-        """Make a live API call to OpenAI"""
-        response = self._original_create(**kwargs)
-        return response
-
-    def dict_to_model_response(self, dict_response: Dict[str, Any]) -> ChatCompletion:
-        """Convert a dictionary back to a model response object"""
-        return ChatCompletion.model_validate(dict_response)
-
-    def model_response_to_dict(self, model_response: ChatCompletion) -> Dict[str, Any]:
-        """Convert a model response object to a dictionary"""
-        return model_response.model_dump()
-
-
-class CompletionsRecorder(completions.Completions):
+class CompletionsRecorder(completions.Completions, LLMRecorder):
     """Subclass of OpenAI Completions that uses LLMRecorder for create calls"""
 
     def __init__(
         self,
         client: OpenAI,
-        replay_dir: str | Path,
-        save_dir: Optional[str | Path] = None,
+        store_path: str | Path,
         replay_count: int = 0,
         **kwargs,
     ):
         super().__init__(client=client, **kwargs)
-        # Store the original create method before we override it
-        original_create = super().create
-        self._replay_llm = OpenAILLMRecorder(
-            original_create=original_create,
-            replay_dir=replay_dir,
-            save_dir=save_dir,
+        LLMRecorder.__init__(
+            self,
+            store_path=store_path,
             replay_count=replay_count,
         )
 
-    def create(self, **kwargs) -> ChatCompletion:
-        response = self._replay_llm.completion(**kwargs)
+    def live_call(self, **kwargs) -> ChatCompletion:
+        """Make a live API call to OpenAI"""
+        response = super().create(**kwargs)
         return response
+
+    def create(self, **kwargs) -> ChatCompletion:
+        dict_response = self.dict_completion(**kwargs)
+        return ChatCompletion.model_validate(dict_response)
+
+    def req_to_dict(self, req: Dict[str, Any]) -> Dict[str, Any]:
+        return req
+
+    def res_to_dict(self, res: ChatCompletion) -> Dict[str, Any]:
+        return res.model_dump()
 
 
 class ChatRecorder(chat.Chat):
@@ -69,21 +55,18 @@ class ChatRecorder(chat.Chat):
     def __init__(
         self,
         client: OpenAI,
-        replay_dir: str | Path,
-        save_dir: Optional[str | Path] = None,
+        store_path: str | Path,
         replay_count: int = 0,
     ):
         super().__init__(client=client)
-        self._replay_dir = replay_dir
-        self._save_dir = save_dir
+        self._store_path = store_path
         self._replay_count = replay_count
 
     @cached_property
     def completions(self) -> CompletionsRecorder:
         return CompletionsRecorder(
             self._client,
-            replay_dir=self._replay_dir,
-            save_dir=self._save_dir,
+            store_path=self._store_path,
             replay_count=self._replay_count,
         )
 
@@ -93,8 +76,7 @@ class OpenAIRecorder(OpenAI):
 
     def __init__(
         self,
-        replay_dir: str | Path,
-        save_dir: Optional[str | Path] = None,
+        store_path: str | Path,
         replay_count: int = 0,
         **kwargs,
     ):
@@ -112,8 +94,7 @@ class OpenAIRecorder(OpenAI):
         # Create new chat instance with replay support
         self.chat = ChatRecorder(
             client=self,
-            replay_dir=replay_dir,
-            save_dir=save_dir,
+            store_path=store_path,
             replay_count=replay_count,
             **kwargs,
         )

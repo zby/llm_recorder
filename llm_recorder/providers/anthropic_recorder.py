@@ -7,6 +7,7 @@ from pprint import pprint
 try:
     import anthropic
     from anthropic import Anthropic
+    from anthropic.resources.messages import Messages
     from anthropic.types import Message
 except ImportError:
     raise ImportError(
@@ -15,52 +16,38 @@ except ImportError:
     )
 
 
-class AnthropicReplayLLM(LLMRecorder):
-    """Implementation of LLMRecorder for Anthropic"""
-
-    def __init__(self, original_create, **kwargs):
-        super().__init__(**kwargs)
-        self._original_create = original_create
-
-    def make_live_call(self, **kwargs) -> Message:
-        """Make a live API call to Anthropic"""
-        pprint(kwargs)
-        response = self._original_create(**kwargs)
-        return response
-
-    def dict_to_model_response(self, dict_response: Dict[str, Any]) -> Message:
-        """Convert a dictionary back to a model response object"""
-        return Message.model_validate(dict_response)
-
-    def model_response_to_dict(self, model_response: Message) -> Dict[str, Any]:
-        """Convert a model response object to a dictionary"""
-        return model_response.model_dump()
-
-
-class ReplayMessages:
-    """Wrapper for Anthropic messages that uses LLMRecorder for create calls"""
+class ReplayMessages(Messages, LLMRecorder):
+    """Wrapper for Anthropic messages that uses LLMRecorder to replay messages"""
 
     def __init__(
         self,
         client: Anthropic,
-        replay_dir: str | Path,
-        save_dir: Optional[str | Path] = None,
+        store_path: str | Path,
         replay_count: int = 0,
     ):
-        self._client = client
-        # Store the original create method
-        self._original_create = client.messages.create
-        self._replay_llm = AnthropicReplayLLM(
-            original_create=self._original_create,
-            replay_dir=replay_dir,
-            save_dir=save_dir,
+        super().__init__(client=client)
+        LLMRecorder.__init__(
+            self,
+            store_path=store_path,
             replay_count=replay_count,
         )
 
+
+    def live_call(self, **kwargs) -> Message:
+        """Make a live API call to Anthropic"""
+        response = super().create(**kwargs)
+        return response
+
+    def req_to_dict(self, req: Dict[str, Any]) -> Dict[str, Any]:
+        return req
+
+    def res_to_dict(self, res: Message) -> Dict[str, Any]:
+        return res.model_dump()
+
     def create(self, **kwargs) -> Message:
         """Create a message with replay support"""
-        response = self._replay_llm.completion(**kwargs)
-        return response
+        dict_response = self.dict_completion(**kwargs)
+        return Message.model_validate(dict_response)
 
 
 class ReplayAnthropic(Anthropic):
@@ -68,8 +55,7 @@ class ReplayAnthropic(Anthropic):
 
     def __init__(
         self,
-        replay_dir: str | Path,
-        save_dir: Optional[str | Path] = None,
+        store_path: str | Path,
         replay_count: int = 0,
         **kwargs,
     ):
@@ -87,7 +73,7 @@ class ReplayAnthropic(Anthropic):
         # Create messages instance with replay support
         self.messages = ReplayMessages(
             client=self,
-            replay_dir=replay_dir,
-            save_dir=save_dir,
+            store_path=store_path,
             replay_count=replay_count,
         )
+

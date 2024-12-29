@@ -2,8 +2,10 @@ import pytest
 from pathlib import Path
 import json
 import tempfile
-from llm_recorder import LLMRecorder, LLMInteraction
+from llm_recorder.llm_recorder import LLMRecorder, LLMInteraction, FilePersistence
 from dataclasses import dataclass
+from typing import Any, Dict
+from datetime import datetime
 
 
 @pytest.fixture
@@ -39,13 +41,18 @@ def sample_response():
 
 def create_interaction_files(directory: Path, request: dict, response: dict):
     """Helper to create interaction files in a directory"""
-    with open(directory / "1.request.json", "w") as f:
-        json.dump(request, f)
-    with open(directory / "1.response.json", "w") as f:
-        json.dump(response, f)
+    persistence = FilePersistence(directory)
+    interaction = LLMInteraction(
+        timestamp=datetime.now().isoformat(),
+        request=request,
+        response=response
+    )
+    persistence.save(interaction)
 
 
 def test_save_and_load_interaction(temp_dir):
+    persistence = FilePersistence(temp_dir)
+    
     interaction = LLMInteraction(
         timestamp="2024-01-01T00:00:00",
         request={
@@ -55,9 +62,16 @@ def test_save_and_load_interaction(temp_dir):
         response={"choices": [{"message": {"content": "Hi!"}}]},
     )
 
-    interaction.save_to_directory(temp_dir, 1)
-    loaded = LLMInteraction.load_from_directory(temp_dir, 1)
+    # Save the interaction
+    persistence.save(interaction)
 
+    # Load all interactions (limit=1 since we only saved one)
+    loaded_interactions = persistence.load_all(limit=1)
+    
+    assert len(loaded_interactions) == 1
+    loaded = loaded_interactions[0]
+
+    # Compare the dictionaries
     assert loaded.request == interaction.request
     assert loaded.response == interaction.response
 
@@ -71,62 +85,56 @@ class MockResponse:
 
 
 class MockReplayLLM(LLMRecorder):
-    """Test implementation of ReplayLLM"""
+    """Test implementation of LLMRecorder"""
 
-    def make_live_call(self, **kwargs) -> MockResponse:
+    def live_call(self, **kwargs) -> dict:
         """Simulate a live API call"""
-        return MockResponse(content="This is a live response")
+        return {"choices": [{"message": {"content": "This is a live response"}}]}
 
-    def dict_to_model_response(self, dict_response: dict) -> MockResponse:
-        """Convert dictionary to MockResponse"""
-        return MockResponse(
-            content=dict_response["choices"][0]["message"]["content"],
-            model=dict_response.get("model", "mock-model"),
-        )
+    def req_to_dict(self, req: Any) -> Dict[str, Any]:
+        """Convert request to dictionary"""
+        return req
 
-    def model_response_to_dict(self, model_response: MockResponse) -> dict:
-        """Convert MockResponse to dictionary"""
-        return {
-            "model": model_response.model,
-            "choices": [{"message": {"content": model_response.content}}],
-        }
+    def res_to_dict(self, res: Any) -> Dict[str, Any]:
+        """Convert response to dictionary"""
+        return res
 
 
 def test_replay_llm_replay_mode(temp_dir, sample_request, sample_response):
     # Create interaction files
     create_interaction_files(temp_dir, sample_request, sample_response)
 
-    # Initialize ReplayLLM in replay mode
-    llm = MockReplayLLM(replay_dir=temp_dir, replay_count=1)
+    # Initialize LLMRecorder in replay mode
+    llm = MockReplayLLM(store_path=temp_dir, replay_count=1)
 
     # Get response - should be from replay
-    response = llm.completion(**sample_request)
+    response = llm.dict_completion(**sample_request)
 
-    assert isinstance(response, MockResponse)
-    assert response.content == "Hello there!"
+    assert isinstance(response, dict)
+    assert response["choices"][0]["message"]["content"] == "Hello there!"
 
 
 def test_replay_llm_live_mode(temp_dir):
-    # Initialize ReplayLLM with no replay interactions
-    llm = MockReplayLLM(replay_dir=temp_dir, replay_count=0)
+    # Initialize LLMRecorder with no replay interactions
+    llm = MockReplayLLM(store_path=temp_dir, replay_count=0)
 
     # Get response - should be live
-    response = llm.completion(messages=[{"role": "user", "content": "Hi"}])
+    response = llm.dict_completion(messages=[{"role": "user", "content": "Hi"}])
 
-    assert isinstance(response, MockResponse)
-    assert response.content == "This is a live response"
+    assert isinstance(response, dict)
+    assert response["choices"][0]["message"]["content"] == "This is a live response"
 
 
 def test_replay_llm_saves_interactions(temp_dir, sample_request):
-    # Initialize ReplayLLM
-    llm = MockReplayLLM(replay_dir=temp_dir, replay_count=0)
+    # Initialize LLMRecorder
+    llm = MockReplayLLM(store_path=temp_dir, replay_count=0)
 
     # Make a call
-    llm.completion(**sample_request)
+    llm.dict_completion(**sample_request)
 
     # Check that files were saved
-    assert (temp_dir / "1.request.json").exists()
-    assert (temp_dir / "1.response.json").exists()
+    assert list(temp_dir.glob("1.request_*.json"))  # Should find at least one request file
+    assert list(temp_dir.glob("1.response_*.json"))  # Should find at least one response file
 
 
 def test_replay_llm_invalid_replay_count(temp_dir, sample_request, sample_response):
@@ -134,5 +142,5 @@ def test_replay_llm_invalid_replay_count(temp_dir, sample_request, sample_respon
     create_interaction_files(temp_dir, sample_request, sample_response)
 
     # Try to replay more interactions than exist
-    with pytest.raises(ValueError, match="replay_count is greater than"):
-        MockReplayLLM(replay_dir=temp_dir, replay_count=2)
+    with pytest.raises(ValueError, match="replay_count .* > available interactions"):
+        MockReplayLLM(store_path=temp_dir, replay_count=2)

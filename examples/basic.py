@@ -8,7 +8,7 @@ import litellm
 # - ANTHROPIC_API_KEY for Anthropic models
 
 
-enable_replay_mode(replay_dir="examples/saves/basic")
+enable_replay_mode(store_path="examples/saves/basic")
 
 print("After patching:", litellm.completion.__name__)
 
@@ -18,5 +18,8 @@ response = litellm.completion(
     model="openai/gpt-4o-mini",
     messages=[{"content": "Hello, how are you?", "role": "user"}],
 )
+
+print(response)
+#print(response.choices[0].message.content)
 
 # Now the request and response are recorded in the examples/saves/basic directory

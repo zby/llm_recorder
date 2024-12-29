@@ -15,7 +15,7 @@ import litellm
 MODEL = "anthropic/claude-3-5-sonnet-20240620"
 
 
-enable_replay_mode(replay_dir="examples/saves/chained_calls", replay_count=1)
+enable_replay_mode(store_path="examples/saves/chained_calls", replay_count=1)
 # replay_count=1 means that the first call will be replayed and the second will be live
 
 # System message to set the context for our interaction

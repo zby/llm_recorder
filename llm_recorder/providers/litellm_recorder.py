@@ -1,23 +1,47 @@
-from typing import Dict, Any, Optional
+from typing import Optional, Dict, Any
 import litellm
-from ..llm_recorder import LLMRecorder
+from llm_recorder import LLMRecorder
 from pathlib import Path
 
 # this is for monkey patching
-_rllm_instance: Optional["LLMRecorder"] = None
+_rllm_instance: Optional["LitellmRecorder"] = None
+
+# Store the original completion function
+_original_completion = litellm.completion
+
+
+class LitellmRecorder(LLMRecorder):
+    # first we need to implement the live_call, req_to_dict and res_to_dict methods
+    # that are abstract in the LLMRecorder class
+
+    def live_call(self, **kwargs) -> litellm.Message:
+        """Make a live call to the LLM using the original completion function."""
+        return _original_completion(**kwargs)
+
+    def req_to_dict(self, req: Dict[str, Any]) -> Dict[str, Any]:
+        return req
+
+    def res_to_dict(self, res: litellm.ModelResponse) -> Dict[str, Any]:
+        res_dict = res.to_dict()
+        return res_dict
+
+    # then we can implement the completion method for convenience
+
+    def completion(self, **kwargs) -> litellm.ModelResponse:
+        dict_response = self.dict_completion(**kwargs)
+        litellm_message = litellm.ModelResponse(**dict_response)
+        return litellm_message
 
 
 def enable_replay_mode(
-    replay_dir: str | Path,
-    save_dir: Optional[str | Path] = None,
+    store_path: str | Path,
     replay_count: int = 0,
 ) -> None:
     """
     Enable replay mode by creating a LiteLLMRecorder instance and monkey-patching litellm.completion.
 
     Args:
-        replay_dir: Directory to load interactions from.
-        save_dir: Directory to save new interactions. Defaults to replay_dir if None.
+        store_path: Directory to load interactions from.
         replay_count: Number of interactions to replay before making live calls.
     """
     global _rllm_instance
@@ -26,9 +50,8 @@ def enable_replay_mode(
         # Already enabled, do nothing
         return
 
-    _rllm_instance = LiteLLMRecorder(
-        replay_dir=replay_dir,
-        save_dir=save_dir,
+    _rllm_instance = LitellmRecorder(
+        store_path=store_path,
         replay_count=replay_count,
     )
 
@@ -36,22 +59,3 @@ def enable_replay_mode(
         return _rllm_instance.completion(**kwargs)
 
     litellm.completion = patched_completion
-
-
-class LiteLLMRecorder(LLMRecorder):
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-        self.completion_function = litellm.completion
-
-    def make_live_call(self, **kwargs) -> Any:
-        return self.completion_function(**kwargs)
-
-    def dict_to_model_response(
-        self, dict_response: Dict[str, Any]
-    ) -> litellm.ModelResponse:
-        return litellm.ModelResponse(**dict_response)
-
-    def model_response_to_dict(
-        self, model_response: litellm.ModelResponse
-    ) -> Dict[str, Any]:
-        return model_response.model_dump()

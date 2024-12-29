@@ -21,7 +21,7 @@ def test_enable_replay_mode():
         # Check that _rllm_instance was created and is the correct type
         assert litellm_recorder._rllm_instance is not None
         assert isinstance(
-            litellm_recorder._rllm_instance, litellm_recorder.LiteLLMRecorder
+            litellm_recorder._rllm_instance, litellm_recorder.LitellmRecorder
         )
 
         # Check that litellm.completion has been changed
