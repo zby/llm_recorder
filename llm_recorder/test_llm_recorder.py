@@ -44,7 +44,7 @@ def create_interaction_files(directory: Path, request: dict, response: dict):
     interaction = LLMInteraction(
         timestamp=datetime.now().isoformat(), request=request, response=response
     )
-    persistence.save(interaction)
+    persistence.save(interaction, 1)
 
 
 def test_save_and_load_interaction(temp_dir):
@@ -60,7 +60,7 @@ def test_save_and_load_interaction(temp_dir):
     )
 
     # Save the interaction
-    persistence.save(interaction)
+    persistence.save(interaction, 1)
 
     # Load all interactions (limit=1 since we only saved one)
     loaded_interactions = persistence.load_all(limit=1)
@@ -145,3 +145,22 @@ def test_replay_llm_invalid_replay_count(temp_dir, sample_request, sample_respon
     # Try to replay more interactions than exist
     with pytest.raises(ValueError, match="replay_count .* > available interactions"):
         MockReplayLLM(store_path=temp_dir, replay_count=2)
+
+
+def test_replay_llm_continues_numbering(temp_dir, sample_request, sample_response):
+    # Create two interaction files
+    create_interaction_files(temp_dir, sample_request, sample_response)
+
+    # Initialize LLMRecorder with replay_count=2
+    llm = MockReplayLLM(store_path=temp_dir, replay_count=1)
+
+    llm.dict_completion(**sample_request)
+    # Make a new live call
+    llm.dict_completion(**sample_request)
+
+    # The first interaction should be resaved
+    assert list(temp_dir.glob("1.request_*.json"))
+    assert list(temp_dir.glob("1.response_*.json"))
+    # The second interaction should be saved
+    assert list(temp_dir.glob("2.request_*.json"))
+    assert list(temp_dir.glob("2.response_*.json"))

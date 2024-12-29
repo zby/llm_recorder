@@ -3,15 +3,14 @@ import litellm
 from llm_recorder.providers.litellm_recorder import LitellmRecorder
 
 MODEL = "gpt-4o-mini"
-MODEL = "anthropic/claude-3-5-haiku-20240307"
+MODEL = "anthropic/claude-3-5-haiku-latest"
 
-MODEL = "anthropic/claude-3-5-sonnet-20240620"
 
 def main():
     # Initialize the recorder
     recorder = LitellmRecorder(
         store_path="examples/saves/direct",
-        replay_count=1,  # Set to 0 to make live calls, or N to replay N recordings
+        replay_count=2,  # Set to 0 to make live calls, or N to replay N recordings
     )
 
     # First call

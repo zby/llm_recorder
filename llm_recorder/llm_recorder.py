@@ -26,15 +26,14 @@ class FilePersistence:
     """
     A file-based persistence layer that saves each LLMInteraction
     in separate JSON files:
-      - 1.request.json
-      - 1.response.json
+      - 1.request_xxx.json
+      - 1.response_xxx.json
       - etc.
     """
 
     def __init__(self, directory: Path):
         self.directory = directory
         self.directory.mkdir(parents=True, exist_ok=True)
-        self._current_index = 0
 
     def load_all(self, limit: int) -> List[LLMInteraction]:
         interactions = []
@@ -54,7 +53,6 @@ class FilePersistence:
 
         # Clean up the directory after loading
         self._cleanup_directory()
-        self._current_index = 0
         return interactions
 
     def _cleanup_directory(self) -> None:
@@ -62,18 +60,16 @@ class FilePersistence:
         for file in self.directory.glob("*.json"):
             file.unlink()
 
-    def save(self, interaction: LLMInteraction) -> None:
-        self._current_index += 1
-
+    def save(self, interaction: LLMInteraction, index: int) -> None:
         # Save each key in the request dictionary as a separate file
         for key, value in interaction.request.items():
-            filename = f"{self._current_index}.request_{key}.json"
+            filename = f"{index}.request_{key}.json"
             with open(self.directory / filename, "w") as f:
                 json.dump(value, f, indent=2)
 
         # Save each key in the response dictionary as a separate file
         for key, value in interaction.response.items():
-            filename = f"{self._current_index}.response_{key}.json"
+            filename = f"{index}.response_{key}.json"
             with open(self.directory / filename, "w") as f:
                 json.dump(value, f, indent=2)
 
@@ -179,7 +175,6 @@ class LLMRecorder(ABC):
         # If we have replay interactions left, replay them
         if self.replay_index < len(self.interactions):
             interaction = self.interactions[self.replay_index]
-            self.replay_index += 1
             logger.info(f"Replaying interaction #{self.replay_index}")
         else:
             # Otherwise, make a live call and create a new interaction
@@ -190,8 +185,9 @@ class LLMRecorder(ABC):
                 request=self.req_to_dict(kwargs),
                 response=self.res_to_dict(response),
             )
-            # Save the new interaction
-            self.persistence.save(interaction)
+        # Save the new interaction in both cases
+        self.replay_index += 1
+        self.persistence.save(interaction, self.replay_index)
 
         return interaction.response
 
