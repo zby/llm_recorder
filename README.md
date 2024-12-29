@@ -65,7 +65,7 @@ See [examples/direct_recorder.py](examples/direct_recorder.py).
 
 ## Limitations
 
-- Currently only works with litellm. I've added support for other SDKs and also for storing http messages directly - but it is all experimental.
+- Support for all providers other than litellm is experimental.
 - Only supports synchronous calls.
 
 ## Contributing
