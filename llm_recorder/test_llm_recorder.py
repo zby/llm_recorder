@@ -1,6 +1,5 @@
 import pytest
 from pathlib import Path
-import json
 import tempfile
 from llm_recorder.llm_recorder import LLMRecorder, LLMInteraction, FilePersistence
 from dataclasses import dataclass

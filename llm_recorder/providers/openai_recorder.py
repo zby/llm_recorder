@@ -1,4 +1,4 @@
-from typing import Dict, Any, Optional
+from typing import Dict, Any
 from pathlib import Path
 from ..llm_recorder import LLMRecorder
 

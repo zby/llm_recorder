@@ -1,9 +1,6 @@
-import pytest
 from pathlib import Path
-import json
 import tempfile
 import litellm
-from unittest.mock import patch, MagicMock
 import llm_recorder.providers.litellm_recorder as litellm_recorder
 
 

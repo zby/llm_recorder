@@ -1,11 +1,8 @@
-from typing import Dict, Any, Optional
+from typing import Dict, Any
 from pathlib import Path
 from ..llm_recorder import LLMRecorder
 
-from pprint import pprint
-
 try:
-    import anthropic
     from anthropic import Anthropic
     from anthropic.resources.messages import Messages
     from anthropic.types import Message
