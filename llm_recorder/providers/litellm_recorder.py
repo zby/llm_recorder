@@ -1,4 +1,4 @@
-from typing import Optional, Dict, Any
+from typing import Optional, Dict, Any, Union
 import litellm
 from llm_recorder import LLMRecorder
 from pathlib import Path
@@ -14,16 +14,17 @@ class LitellmRecorder(LLMRecorder):
     # first we need to implement the live_call, req_to_dict and res_to_dict methods
     # that are abstract in the LLMRecorder class
 
-    def live_call(self, **kwargs) -> litellm.Message:
+    def live_call(self, **kwargs) -> litellm.ModelResponse:
         """Make a live call to the LLM using the original completion function."""
         return _original_completion(**kwargs)
 
     def req_to_dict(self, req: Dict[str, Any]) -> Dict[str, Any]:
+        """Convert request to a dictionary format."""
         return req
 
     def res_to_dict(self, res: litellm.ModelResponse) -> Dict[str, Any]:
-        res_dict = res.to_dict()
-        return res_dict
+        """Convert LiteLLM response to a dictionary format."""
+        return res.model_dump()
 
     # then we can implement the completion method for convenience
 
@@ -34,7 +35,7 @@ class LitellmRecorder(LLMRecorder):
 
 
 def enable_replay_mode(
-    store_path: str | Path,
+    store_path: Union[str, Path],
     replay_count: int = 0,
 ) -> None:
     """
