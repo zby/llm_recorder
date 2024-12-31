@@ -65,7 +65,7 @@ See [examples/direct_recorder.py](examples/direct_recorder.py).
 
 ## Limitations
 
-- Support for all providers other than litellm is experimental.
+- Direct support for SDKs (not through litellm) and the recording HTTP client is experimental.
 - Only supports synchronous calls.
 
 ## Contributing
