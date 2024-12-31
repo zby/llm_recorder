@@ -27,11 +27,11 @@ jobs:
         uv pip install -e .
     - name: Lint with flake8
       run: |
-        flake8 llm_recorder --count --select=E9,F63,F7,F82 --show-source --statistics
-        flake8 llm_recorder --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+        uv pip run flake8 llm_recorder --count --select=E9,F63,F7,F82 --show-source --statistics
+        uv pip run flake8 llm_recorder --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
     - name: Test with pytest
       run: |
-        pytest
+        uv pip run pytest
 
   test-latest:
     runs-on: ubuntu-latest
@@ -51,8 +51,8 @@ jobs:
         uv pip install -e .
     - name: Lint with flake8
       run: |
-        flake8 llm_recorder --count --select=E9,F63,F7,F82 --show-source --statistics
-        flake8 llm_recorder --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+        uv pip run flake8 llm_recorder --count --select=E9,F63,F7,F82 --show-source --statistics
+        uv pip run flake8 llm_recorder --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
     - name: Test with pytest
       run: |
-        pytest
+        uv pip run pytest
