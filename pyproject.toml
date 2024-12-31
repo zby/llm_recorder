@@ -12,7 +12,7 @@ authors = [
 dependencies = [
     "litellm>=1.30.7",
 ]
-requires-python = ">=3.8"
+requires-python = ">=3.9"
 readme = "README.md"
 license = {text = "MIT"}
 
