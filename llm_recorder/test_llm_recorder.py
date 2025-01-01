@@ -143,7 +143,7 @@ def test_replay_llm_invalid_replay_count(temp_dir, sample_request, sample_respon
     create_interaction_files(temp_dir, sample_request, sample_response)
 
     # Try to replay more interactions than exist
-    with pytest.raises(ValueError, match="replay_count .* > available interactions"):
+    with pytest.raises(ValueError, match="Cannot replay \(2\) interactions - there are only \(1\) available"):
         MockReplayLLM(store_path=temp_dir, replay_count=2)
 
 
