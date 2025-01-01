@@ -2,8 +2,8 @@ from llm_recorder import enable_replay_mode
 import litellm
 
 # This is a simple example of how to use llm_recorder to record and replay chained LLM calls.
-# There is a saved response in the saves directory from the first call to OpenAI
-# Now we can replay it and then make another live call to Anthropic - fortunately the response dictionaries seem to be compatible
+# There is a saved response in the saves directory from the first call.
+# Now we can replay it and then make another live call to Anthropic.
 
 
 # Note: This example assumes that you have set up your API credentials
@@ -11,8 +11,8 @@ import litellm
 # - OPENAI_API_KEY for OpenAI models
 # - ANTHROPIC_API_KEY for Anthropic models
 
-# MODEL = "openai/gpt-4o-mini"
-MODEL = "anthropic/claude-3-5-sonnet-20240620"
+MODEL = "anthropic/claude-3-5-haiku-latest"
+#MODEL = "openai/gpt-4o-mini"
 
 
 enable_replay_mode(store_path="examples/saves/chained_calls", replay_count=1)

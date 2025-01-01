@@ -6,13 +6,5 @@
   {
     "role": "user",
     "content": "Suggest an interesting scientific topic that most people don't know about. Keep it to one sentence."
-  },
-  {
-    "role": "assistant",
-    "content": "Certainly! Here are three fascinating facts about time crystals:\n\n1. Time crystals were first proposed theoretically in 2012 by Nobel laureate Frank Wilczek and were experimentally created for the first time in 2017.\n\n2. Unlike normal crystals that have a repeating spatial structure, time crystals exhibit a repeating pattern in time, oscillating between different states without consuming energy.\n\n3. Time crystals have potential applications in quantum computing, as they could be used to create more stable qubits that are less susceptible to environmental interference."
-  },
-  {
-    "role": "user",
-    "content": "That's interesting! Can you explain Certainly! Here are three fascinating facts about time crystals:\n\n1. Time crystals were first proposed theoretically in 2012 by Nobel laureate Frank Wilczek and were experimentally created for the first time in 2017.\n\n2. Unlike normal crystals that have a repeating spatial structure, time crystals exhibit a repeating pattern in time, oscillating between different states without consuming energy.\n\n3. Time crystals have potential applications in quantum computing, as they could be used to create more stable qubits that are less susceptible to environmental interference. in more detail? Give me 3 fascinating facts about it."
   }
 ]

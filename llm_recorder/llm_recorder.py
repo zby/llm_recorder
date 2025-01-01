@@ -144,7 +144,7 @@ class LLMRecorder(ABC):
         )
         if replay_count > len(self.interactions):
             raise ValueError(
-                f"replay_count ({replay_count}) > available interactions ({len(self.interactions)})"
+                f"Cannot replay ({replay_count}) interactions - there are only ({len(self.interactions)}) available"
             )
 
     @abstractmethod

@@ -26,7 +26,7 @@ For a quick start use `enable_replay_mode`; it monkey patches `litellm` to recor
 
 `llm_recorder` records any calls to `litellm.completion` and their responses and stores them in the directory specified by `store_path`.
 
-Specify `replay_count` to replay previously recorded interactions.
+Specify `replay_count` to replay previously recorded interactions (by default no interactions are replayed).
 Once the replayed interactions are exhausted, `llm_recorder` falls back to live LLM calls.
 
 The `store_path` is cleaned up at the start of each run, but interactions from the previous run are read before that cleanup.
@@ -40,7 +40,7 @@ from llm_recorder import enable_replay_mode
 import litellm
 
 
-enable_replay_mode(="saves")
+enable_replay_mode(store_path="saves")
 
 print("After:", litellm.completion.__name__)
 
