@@ -107,6 +107,11 @@ class LLMRecorder(ABC):
     """
     A simple recorder that automatically creates a FilePersistence by default,
     unless a custom persistence is provided.
+
+    This class must be subclassed with implementations of the following abstract methods:
+    - live_call(**kwargs): Make actual calls to the LLM API
+    - req_to_dict(req): Convert request parameters to a serializable dictionary
+    - res_to_dict(res): Convert API response to a serializable dictionary
     """
 
     def __init__(
@@ -122,7 +127,6 @@ class LLMRecorder(ABC):
         will be created using `store_path`.
 
         Args:
-            live_call: Callable that performs the actual API/LLM call
             store_path: Directory where interactions are stored
             replay_count: The number of interactions to replay before making live calls, defaults to 0
             persistence: (Optional) a custom Persistence implementation. If provided,
