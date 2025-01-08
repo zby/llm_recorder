@@ -4,9 +4,9 @@ import os
 MODEL = "claude-3-haiku-20240307"
 
 client = ReplayAnthropic(
+    "examples/saves/anthropic",
     api_key=os.environ["ANTHROPIC_API_KEY"],
-    store_path="examples/saves/anthropic",
-    replay_count=2,
+    replay_count=1,
 )
 # Make some API calls
 for i in range(3):

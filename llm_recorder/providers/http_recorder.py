@@ -65,9 +65,7 @@ class HTTPRecorder(httpx.Client, LLMRecorder):
 # Example usage
 if __name__ == "__main__":
     # Create a recorder instance
-    http_client = HTTPRecorder(
-        store_path="./http_logs",
-    )
+    http_client = HTTPRecorder("./http_logs")
 
     # Create OpenAI client with our recorder as the http_client
     client = OpenAI(http_client=http_client)

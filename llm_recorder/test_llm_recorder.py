@@ -102,7 +102,7 @@ def test_replay_llm_replay_mode(temp_dir, sample_request, sample_response):
     create_interaction_files(temp_dir, sample_request, sample_response)
 
     # Initialize LLMRecorder in replay mode
-    llm = MockReplayLLM(store_path=temp_dir, replay_count=1)
+    llm = MockReplayLLM(temp_dir, replay_count=1)
 
     # Get response - should be from replay
     response = llm.dict_completion(**sample_request)
@@ -113,7 +113,7 @@ def test_replay_llm_replay_mode(temp_dir, sample_request, sample_response):
 
 def test_replay_llm_live_mode(temp_dir):
     # Initialize LLMRecorder with no replay interactions
-    llm = MockReplayLLM(store_path=temp_dir, replay_count=0)
+    llm = MockReplayLLM(temp_dir, replay_count=0)
 
     # Get response - should be live
     response = llm.dict_completion(messages=[{"role": "user", "content": "Hi"}])
@@ -124,7 +124,7 @@ def test_replay_llm_live_mode(temp_dir):
 
 def test_replay_llm_saves_interactions(temp_dir, sample_request):
     # Initialize LLMRecorder
-    llm = MockReplayLLM(store_path=temp_dir, replay_count=0)
+    llm = MockReplayLLM(temp_dir, replay_count=0)
 
     # Make a call
     llm.dict_completion(**sample_request)
@@ -144,15 +144,15 @@ def test_replay_llm_invalid_replay_count(temp_dir, sample_request, sample_respon
 
     # Try to replay more interactions than exist
     with pytest.raises(ValueError, match="Cannot replay \(2\) interactions - there are only \(1\) available"):
-        MockReplayLLM(store_path=temp_dir, replay_count=2)
+        MockReplayLLM(temp_dir, replay_count=2)
 
 
 def test_replay_llm_continues_numbering(temp_dir, sample_request, sample_response):
     # Create two interaction files
     create_interaction_files(temp_dir, sample_request, sample_response)
 
-    # Initialize LLMRecorder with replay_count=2
-    llm = MockReplayLLM(store_path=temp_dir, replay_count=1)
+    # Initialize LLMRecorder
+    llm = MockReplayLLM(temp_dir, replay_count=1)
 
     llm.dict_completion(**sample_request)
     # Make a new live call

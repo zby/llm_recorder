@@ -1,6 +1,6 @@
-from typing import Dict, Any
+from typing import Dict, Any, Union
 from pathlib import Path
-from ..llm_recorder import LLMRecorder
+from ..llm_recorder import LLMRecorder, Persistence
 
 try:
     from anthropic import Anthropic
@@ -19,13 +19,13 @@ class ReplayMessages(Messages, LLMRecorder):
     def __init__(
         self,
         client: Anthropic,
-        store_path: str | Path,
+        persistence: Union[str, Path, Persistence],
         replay_count: int = 0,
     ):
         super().__init__(client=client)
         LLMRecorder.__init__(
             self,
-            store_path=store_path,
+            persistence,
             replay_count=replay_count,
         )
 
@@ -51,7 +51,7 @@ class ReplayAnthropic(Anthropic):
 
     def __init__(
         self,
-        store_path: str | Path,
+        persistence: Union[str, Path, Persistence],
         replay_count: int = 0,
         **kwargs,
     ):
@@ -59,8 +59,7 @@ class ReplayAnthropic(Anthropic):
         Initialize ReplayAnthropic.
 
         Args:
-            replay_dir: Directory to load interactions from
-            save_dir: Optional directory to save new interactions. If None, saves to replay_dir
+            persistence: Either a Persistence implementation or a path (str/Path) for default FilePersistence
             replay_count: Number of interactions to replay before making live calls
             **kwargs: Additional arguments passed to Anthropic client
         """
@@ -69,6 +68,6 @@ class ReplayAnthropic(Anthropic):
         # Create messages instance with replay support
         self.messages = ReplayMessages(
             client=self,
-            store_path=store_path,
+            persistence=persistence,
             replay_count=replay_count,
         )

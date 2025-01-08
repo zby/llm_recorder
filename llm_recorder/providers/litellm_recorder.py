@@ -1,6 +1,6 @@
 from typing import Optional, Dict, Any, Union
 import litellm
-from llm_recorder import LLMRecorder
+from llm_recorder import LLMRecorder, Persistence
 from pathlib import Path
 
 # this is for monkey patching
@@ -11,6 +11,10 @@ _original_completion = litellm.completion
 
 
 class LitellmRecorder(LLMRecorder):
+    """
+    A concrete implementation of LLMRecorder for LiteLLM.
+    """
+
     # first we need to implement the live_call, req_to_dict and res_to_dict methods
     # that are abstract in the LLMRecorder class
 
@@ -35,14 +39,14 @@ class LitellmRecorder(LLMRecorder):
 
 
 def enable_replay_mode(
-    store_path: Union[str, Path],
+    persistence: Union[str, Path, Persistence],
     replay_count: int = 0,
 ) -> None:
     """
     Enable replay mode by creating a LiteLLMRecorder instance and monkey-patching litellm.completion.
 
     Args:
-        store_path: Directory to load interactions from.
+        persistence: Directory to load interactions from or a Persistence implementation.
         replay_count: Number of interactions to replay before making live calls.
     """
     global _rllm_instance
@@ -52,7 +56,7 @@ def enable_replay_mode(
         return
 
     _rllm_instance = LitellmRecorder(
-        store_path=store_path,
+        persistence=persistence,
         replay_count=replay_count,
     )
 

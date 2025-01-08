@@ -8,7 +8,7 @@ import litellm
 # - ANTHROPIC_API_KEY for Anthropic models
 
 
-enable_replay_mode(store_path="examples/saves/basic")
+enable_replay_mode("examples/saves/basic")
 
 print("After patching:", litellm.completion.__name__)
 

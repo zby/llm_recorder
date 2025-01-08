@@ -1,0 +1,15 @@
+[
+  {
+    "finish_reason": "stop",
+    "index": 0,
+    "logprobs": null,
+    "message": {
+      "content": "The cat's curiosity led her to a magical portal that transported her to a world where she was worshipped as a goddess.",
+      "refusal": null,
+      "role": "assistant",
+      "audio": null,
+      "function_call": null,
+      "tool_calls": null
+    }
+  }
+]

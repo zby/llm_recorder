@@ -105,10 +105,7 @@ class FilePersistence:
 
 class LLMRecorder(ABC):
     """
-    A simple recorder that automatically creates a FilePersistence by default,
-    unless a custom persistence is provided.
-
-    This class must be subclassed with implementations of the following abstract methods:
+    A concrete subclass must implement the following methods:
     - live_call(**kwargs): Make actual calls to the LLM API
     - req_to_dict(req): Convert request parameters to a serializable dictionary
     - res_to_dict(res): Convert API response to a serializable dictionary
@@ -116,26 +113,19 @@ class LLMRecorder(ABC):
 
     def __init__(
         self,
-        store_path: Union[str, Path],
+        persistence: Union[str, Path, "Persistence"],
         replay_count: int = 0,
-        persistence: Optional["Persistence"] = None,
     ):
         """
         Initialize an LLMRecorder.
 
-        If no `persistence` object is provided, a default FilePersistence
-        will be created using `store_path`.
-
         Args:
-            store_path: Directory where interactions are stored
+            persistence: Either a Persistence implementation or a path (str/Path) for default FilePersistence
             replay_count: The number of interactions to replay before making live calls, defaults to 0
-            persistence: (Optional) a custom Persistence implementation. If provided,
-                         it overrides the default FilePersistence creation.
         """
-
-        # If the user didn't provide a persistence object, create a FilePersistence
-        if persistence is None:
-            self.persistence = FilePersistence(directory=Path(store_path))
+        # If persistence is a string/Path, create a FilePersistence
+        if isinstance(persistence, (str, Path)):
+            self.persistence = FilePersistence(directory=Path(persistence))
         else:
             self.persistence = persistence
 
@@ -215,7 +205,7 @@ if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
 
     # Example 1: Recording new interactions
-    recorder = ExampleLLMRecorder(store_path="./example_logs")
+    recorder = ExampleLLMRecorder("./example_logs")
 
     # Make some example calls that will be recorded
     result1 = recorder.completion(
@@ -234,7 +224,7 @@ if __name__ == "__main__":
 
     # Example 2: Replaying recorded interactions
     replay_recorder = ExampleLLMRecorder(
-        store_path="./example_logs",
+        persistence="./example_logs",
         replay_count=2,  # Replay the two interactions we just recorded
     )
 

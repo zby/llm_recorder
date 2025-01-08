@@ -8,7 +8,7 @@ genai.configure(api_key=os.environ["GEMINI_API_KEY"])
 # Get a model with recording capabilities
 model = RecorderGenerativeModel(
     "gemini-1.5-flash",
-    store_path="examples/saves/google",
+    "examples/saves/google",
     replay_count=2,
 )
 

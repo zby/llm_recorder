@@ -1,6 +1,6 @@
-from typing import Dict, Any
+from typing import Dict, Any, Union
 from pathlib import Path
-from ..llm_recorder import LLMRecorder
+from ..llm_recorder import LLMRecorder, Persistence
 
 try:
     from google.generativeai.types import GenerateContentResponse
@@ -19,7 +19,7 @@ class RecorderGenerativeModel(GenerativeModel, LLMRecorder):
     def __init__(
         self,
         model_name: str,
-        store_path: str | Path,
+        persistence: Union[str, Path, Persistence],
         replay_count: int = 0,
         **kwargs,
     ):
@@ -28,14 +28,14 @@ class RecorderGenerativeModel(GenerativeModel, LLMRecorder):
 
         Args:
             model_name: Name of the Google model to use (e.g., "gemini-pro")
-            store_path: Directory to load interactions from
+            persistence: Directory to load interactions from or a Persistence implementation
             replay_count: Number of interactions to replay before making live calls
             **kwargs: Additional arguments passed to GenerativeModel constructor
         """
         super().__init__(model_name=model_name, **kwargs)
         LLMRecorder.__init__(
             self,
-            store_path=store_path,
+            persistence=persistence,
             replay_count=replay_count,
         )
 

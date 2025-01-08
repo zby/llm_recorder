@@ -1,7 +1,7 @@
 {
-  "completion_tokens": 31,
-  "prompt_tokens": 13,
-  "total_tokens": 44,
+  "completion_tokens": 26,
+  "prompt_tokens": 22,
+  "total_tokens": 48,
   "completion_tokens_details": {
     "accepted_prediction_tokens": 0,
     "audio_tokens": 0,

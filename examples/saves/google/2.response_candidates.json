@@ -1,0 +1,17 @@
+[
+  {
+    "content": {
+      "parts": [
+        {
+          "text": "The ginger cat, oblivious to the impending thunderstorm, continued its sunbeam nap, purring contentedly as the first fat raindrop splattered onto its nose.\n"
+        }
+      ],
+      "role": "model"
+    },
+    "finish_reason": 1,
+    "avg_logprobs": -0.1868603650261374,
+    "safety_ratings": [],
+    "token_count": 0,
+    "grounding_attributions": []
+  }
+]

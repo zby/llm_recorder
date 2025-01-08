@@ -1,6 +1,6 @@
-from typing import Dict, Any
+from typing import Dict, Any, Union
 from pathlib import Path
-from ..llm_recorder import LLMRecorder
+from ..llm_recorder import LLMRecorder, Persistence
 
 from functools import cached_property
 
@@ -22,14 +22,14 @@ class CompletionsRecorder(completions.Completions, LLMRecorder):
     def __init__(
         self,
         client: OpenAI,
-        store_path: str | Path,
+        persistence: Union[str, Path, Persistence],
         replay_count: int = 0,
         **kwargs,
     ):
         super().__init__(client=client, **kwargs)
         LLMRecorder.__init__(
             self,
-            store_path=store_path,
+            persistence,
             replay_count=replay_count,
         )
 
@@ -55,18 +55,18 @@ class ChatRecorder(chat.Chat):
     def __init__(
         self,
         client: OpenAI,
-        store_path: str | Path,
+        persistence: Union[str, Path, Persistence],
         replay_count: int = 0,
     ):
         super().__init__(client=client)
-        self._store_path = store_path
+        self._persistence = persistence
         self._replay_count = replay_count
 
     @cached_property
     def completions(self) -> CompletionsRecorder:
         return CompletionsRecorder(
             self._client,
-            store_path=self._store_path,
+            self._persistence,
             replay_count=self._replay_count,
         )
 
@@ -76,7 +76,7 @@ class OpenAIRecorder(OpenAI):
 
     def __init__(
         self,
-        store_path: str | Path,
+        persistence: Union[str, Path, Persistence],
         replay_count: int = 0,
         **kwargs,
     ):
@@ -84,8 +84,7 @@ class OpenAIRecorder(OpenAI):
         Initialize ReplayOpenAI.
 
         Args:
-            replay_dir: Directory to load interactions from
-            save_dir: Optional directory to save new interactions. If None, saves to replay_dir
+            persistence: Either a Persistence implementation or a path (str/Path) for default FilePersistence
             replay_count: Number of interactions to replay before making live calls
             **kwargs: Additional arguments passed to OpenAI client
         """
@@ -94,7 +93,6 @@ class OpenAIRecorder(OpenAI):
         # Create new chat instance with replay support
         self.chat = ChatRecorder(
             client=self,
-            store_path=store_path,
+            persistence=persistence,
             replay_count=replay_count,
-            **kwargs,
         )

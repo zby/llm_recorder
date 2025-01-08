@@ -1,0 +1,17 @@
+[
+  {
+    "content": {
+      "parts": [
+        {
+          "text": "The ginger cat, eyes gleaming with mischief, batted the last Christmas ornament off the tree, then nonchalantly curled up amidst the shattered baubles, purring contentedly.\n"
+        }
+      ],
+      "role": "model"
+    },
+    "finish_reason": 1,
+    "avg_logprobs": -0.24091521671840121,
+    "safety_ratings": [],
+    "token_count": 0,
+    "grounding_attributions": []
+  }
+]
