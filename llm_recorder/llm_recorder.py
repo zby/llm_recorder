@@ -34,6 +34,7 @@ class FilePersistence:
     def __init__(self, directory: Path):
         self.directory = directory
         self.directory.mkdir(parents=True, exist_ok=True)
+        self.loaded_files = set()
 
     def load_all(self, limit: int) -> List[LLMInteraction]:
         interactions = []
@@ -56,9 +57,10 @@ class FilePersistence:
         return interactions
 
     def _cleanup_directory(self) -> None:
-        """Remove all existing files in the directory."""
+        """Remove files that weren't loaded."""
         for file in self.directory.glob("*.json"):
-            file.unlink()
+            if file not in self.loaded_files:
+                file.unlink()
 
     def save(self, interaction: LLMInteraction, index: int) -> None:
         # Save each key in the request dictionary as a separate file
@@ -87,6 +89,7 @@ class FilePersistence:
             key = after_prefix.rsplit(".json", 1)[0]
             with file.open("r") as f:
                 request_data[key] = json.load(f)
+            self.loaded_files.add(file)  # Track this file as loaded
 
         # Build response dictionary
         response_data = {}
@@ -97,6 +100,7 @@ class FilePersistence:
             key = after_prefix.rsplit(".json", 1)[0]
             with file.open("r") as f:
                 response_data[key] = json.load(f)
+            self.loaded_files.add(file)  # Track this file as loaded
 
         return LLMInteraction(
             timestamp="", request=request_data, response=response_data
@@ -162,35 +166,59 @@ class LLMRecorder(ABC):
         """
         pass
 
+    def _replay_interaction(self) -> LLMInteraction:
+        """Replay a saved interaction."""
+        interaction = self.interactions[self.replay_index]
+        logger.info(f"Replaying interaction #{self.replay_index}")
+        return interaction
+
+    def _make_live_call(self, **kwargs) -> LLMInteraction:
+        """Make a live call and create a new interaction."""
+        logger.info("Making live call (no more replays available)")
+        response = self.live_call(**kwargs)
+        interaction = LLMInteraction(
+            timestamp=datetime.now().isoformat(),
+            request=self.req_to_dict(kwargs),
+            response=self.res_to_dict(response),
+        )
+        # Save the new interaction immediately
+        self.persistence.save(interaction, self.replay_index + 1)
+        return interaction
+
     def dict_completion(self, **kwargs) -> Dict[str, Any]:
         """
         Either replay a saved interaction or make a new call (which is recorded).
         """
         # If we have replay interactions left, replay them
         if self.replay_index < len(self.interactions):
-            interaction = self.interactions[self.replay_index]
-            logger.info(f"Replaying interaction #{self.replay_index}")
+            interaction = self._replay_interaction()
         else:
             # Otherwise, make a live call and create a new interaction
-            logger.info("Making live call (no more replays available)")
-            response = self.live_call(**kwargs)
-            interaction = LLMInteraction(
-                timestamp=datetime.now().isoformat(),
-                request=self.req_to_dict(kwargs),
-                response=self.res_to_dict(response),
-            )
-        # Save the new interaction in both cases
-        self.replay_index += 1
-        self.persistence.save(interaction, self.replay_index)
+            interaction = self._make_live_call(**kwargs)
 
+        self.replay_index += 1
         return interaction.response
 
 
 if __name__ == "__main__":
 
-    class ExampleLLMRecorder(LLMRecorder):
+    class ExampleCompletion:
+        def __init__(self, answer: str):
+            self.answer = answer
+            self.count = 0
+
+        def completion(self, **kwargs) -> Dict[str, Any]:
+            self.count += 1
+            return {"answer": f"{self.answer} {self.count}"}
+
+    class ExampleLLMRecorder(ExampleCompletion, LLMRecorder):
+
+        def __init__(self, persistence: Union[str, Path, "Persistence"], replay_count: int = 0):
+            LLMRecorder.__init__(self, persistence=persistence, replay_count=replay_count)
+            ExampleCompletion.__init__(self, answer="Test")
+
         def live_call(self, **kwargs) -> Dict[str, Any]:
-            return {"answer": f"Echo: {kwargs.get('prompt', '')}"}
+            return super().completion(**kwargs)
 
         def req_to_dict(self, req: Any) -> Dict[str, Any]:
             return req
@@ -199,6 +227,7 @@ if __name__ == "__main__":
             return res
 
         def completion(self, **kwargs) -> Dict[str, Any]:
+            # override the completion method so that it uses the reload logic
             return self.dict_completion(**kwargs)
 
     # Set up logging to see what's happening
